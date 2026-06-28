@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Institutional Matrix: Advanced Campus Engine</title>
+    <style>
+        :root {
+            --bg-dark: #030305;
+            --panel-bg: #090a0f;
+            --panel-border: #1a222d;
+            --accent-gold: #d4af37;
+            --text-main: #cbd5e1;
+            --text-muted: #64748b;
+            --neon-blue: #0ea5e9;
+            --crimson: #ef4444;
+            --emerald: #10b981;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden;
+        }
+
+        #game-layout {
+            width: 1555px; height: 920px;
+            background: var(--panel-bg);
+            border: 2px solid var(--panel-border);
+            border-radius: 16px; box-shadow: 0 0 60px rgba(0,0,0,0.85);
+            display: grid; grid-template-columns: 290px 1fr auto; overflow: hidden;
+            position: relative;
+        }
+
+        .hidden { display: none !important; }
+
+        /* --- SIDEBAR HUD --- */
+        #hud-sidebar {
+            width: 290px; background: #050608; border-right: 1px solid var(--panel-border);
+            padding: 16px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto;
+            box-sizing: border-box;
+        }
+        .hud-section-header {
+            font-size: 11px; font-weight: bold; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid #1a222d; padding-bottom: 4px;
+            margin-top: 4px;
+        }
+        .data-row {
+            background: #0f111a; border: 1px solid var(--panel-border);
+            padding: 8px 12px; border-radius: 6px; font-size: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .stat-gauge-container { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+        .progress-container { background: #1e293b; border-radius: 4px; height: 8px; width: 100%; overflow: hidden; }
+        .progress-bar { height: 100%; width: 100%; transition: width 0.3s; }
+
+        /* --- CENTRAL WORKSPACE --- */
+        #center-workspace { display: flex; flex-direction: column; height: 100%; overflow: hidden; position: relative; }
+        #map-nav-bar {
+            background: #050608; border-bottom: 1px solid var(--panel-border);
+            padding: 10px; display: flex; gap: 6px; overflow-x: auto; white-space: nowrap;
+        }
+        .nav-tab-btn {
+            background: #111420; border: 1px solid var(--panel-border); color: var(--text-main);
+            padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 500;
+        }
+        .nav-tab-btn:hover, .nav-tab-btn.active { border-color: var(--accent-gold); color: var(--accent-gold); background: rgba(212,175,55,0.05); }
+
+        #action-desk { flex-grow: 1; padding: 20px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+        .action-node { background: #0f111a; border: 1px solid var(--panel-border); border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+        .select-btn { background: var(--accent-gold); color: #000; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .select-btn:hover { background: #fff; }
+
+        #terminal-log { height: 110px; background: #020203; border-top: 1px solid var(--panel-border); padding: 12px; font-size: 11px; font-family: monospace; overflow-y: auto; color: var(--neon-blue); }
+
+        /* --- PHONE HANDSET ENVIRONMENT --- */
+        #phone-container {
+            background: #050608; border-left: 1px solid var(--panel-border);
+            padding: 15px; display: flex; justify-content: center; align-items: center; position: relative;
+            transition: width 0.3s ease, padding 0.3s ease; width: 390px; box-sizing: border-box;
+        }
+        #phone-container.collapsed { width: 0px; padding: 0px; overflow: hidden; border-left: none; }
+        
+        .phone-body { position: relative; width: 360px; height: 840px; box-shadow: 0 25px 60px rgba(0,0,0,0.8); display: flex; flex-direction: column; overflow: hidden; border-radius: 42px; border: 4px solid #334155; background: #000; }
+        .phone-screen { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; padding: 12px; box-sizing: border-box; background: #0a0c14; }
+        .phone-display-content { flex-grow: 1; overflow-y: auto; padding: 10px 4px; font-size: 12px; z-index: 10; }
+
+        .dynamic-island { width: 90px; height: 24px; background: #000; border-radius: 12px; margin: 0 auto; position: relative; z-index: 100; }
+
+        /* APP ICON INTERFACES */
+        .phone-app-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 15px 5px; }
+        .iphone-icon-large {
+            width: 72px; height: 72px; border-radius: 18px; display: flex; justify-content: center;
+            align-items: center; font-size: 34px; cursor: pointer; background: rgba(15,23,42,0.9);
+            border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 6px 14px rgba(0,0,0,0.4); backdrop-filter: blur(5px);
+            margin: 0 auto; transition: transform 0.2s;
+        }
+        .iphone-icon-large:hover { transform: scale(1.05); }
+        .app-lbl { font-size: 11px; color: #fff; margin-top: 6px; text-align: center; text-shadow: 1px 1px 3px #000; font-weight: 500; display: block; }
+        
+        /* DOCK BUTTONS */
+        .phone-dock {
+            display: grid; grid-template-columns: repeat(4, 1fr); background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(20px); padding: 12px 6px; border-radius: 24px; margin-top: auto; z-index: 20; gap: 4px;
+        }
+        .dock-btn { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); color: #fff; padding: 8px 0; border-radius: 12px; font-size: 10px; cursor: pointer; text-align: center; font-weight: 600; }
+        .dock-btn:hover { background: var(--accent-gold); color: #000; }
+
+        .app-container { background: rgba(5,6,8,0.95); border: 1px solid var(--panel-border); border-radius: 14px; padding: 12px; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; color: #fff; }
+        .shop-row { background: #111420; border: 1px solid var(--panel-border); padding: 8px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* ACCESS CODES */
+        #phone-toggle-tab {
+            position: absolute; right: 20px; top: 16px; z-index: 1000;
+            background: #111420; border: 1px solid var(--panel-border); color: var(--accent-gold);
+            padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold;
+        }
+
+        .sims-panel { background: #0f111a; border: 1px solid var(--accent-gold); border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+        .sims-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .sims-btn { padding: 8px; font-size: 11px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; color: #000; text-align: center; }
+        .sims-friend { background: var(--emerald); }
+        .sims-love { background: var(--pink); }
+        .sims-enemy { background: var(--crimson); color: #fff; }
+
+        #creation-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: #030305; z-index: 500; display: flex; justify-content: center; align-items: center; }
+        .creation-container { background: #090a0f; border: 2px solid var(--panel-border); width: 850px; padding: 30px; border-radius: 12px; max-height: 90vh; overflow-y: auto; }
+
+        .quiz-choice-btn {
+            background: #111420; border: 1px solid var(--panel-border); color: var(--text-main);
+            padding: 12px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; text-align: left;
+            transition: all 0.2s ease; margin-bottom: 10px; display: block; width: 100%;
+        }
+        .quiz-choice-btn:hover {
+            border-color: var(--accent-gold); background: rgba(212,175,55,0.05); color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-layout">
+
+    <button id="phone-toggle-tab" onclick="sim.togglePhoneHardware()">📱 Toggle Phone Interface</button>
+
+    <!-- IDENTITY FORMATION ARCHITECTURE OVERLAY -->
+    <div id="creation-overlay">
+        <div class="creation-container">
+            <h2 style="margin:0 0 20px 0; color:var(--accent-gold); text-align:center;">Institutional System Entry & Identity Setup</h2>
+            
+            <div id="creation-step-1">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:16px; margin-bottom:20px;">
+                    <div class="stat-gauge-container">
+                        <label style="font-size:11px; text-transform:uppercase; color:var(--text-muted);">First Name</label>
+                        <input type="text" id="char-first-name" value="Ara" style="background:#111420; border:1px solid var(--panel-border); padding:10px; color:#fff; border-radius:6px;">
+                    </div>
+                    <div class="stat-gauge-container">
+                        <label style="font-size:11px; text-transform:uppercase; color:var(--text-muted);">Last Name</label>
+                        <input type="text" id="char-last-name" value="Marie" style="background:#111420; border:1px solid var(--panel-border); padding:10px; color:#fff; border-radius:6px;">
+                    </div>
+                    <div class="stat-gauge-container">
+                        <label style="font-size:11px; text-transform:uppercase; color:var(--text-muted);">Gender Matrix</label>
+                        <select id="char-gender" style="background:#111420; border:1px solid var(--panel-border); padding:10px; color:#fff; border-radius:6px;">
+                            <option value="Female">Female Identity</option>
+                            <option value="Male">Male Identity</option>
+                            <option value="Non-Binary">Non-Binary Array</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="stat-gauge-container" style="margin-bottom:25px;">
+                    <label style="font-size:11px; text-transform:uppercase; color:var(--text-muted);">Academic Discipline Major</label>
+                    <select id="char-major" style="background:#111420; border:1px solid var(--panel-border); padding:10px; color:#fff; border-radius:6px; width:100%;">
+                        <option value="Civil Engineering">Civil Engineering Core (Requires: Calculator, Protractor)</option>
+                        <option value="Computer Science">Computer Science Systems (Requires: High-Spec Laptop)</option>
+                        <option value="Fine Arts">Fine Arts & Aesthetics Theory (Requires: Premium Sketchbook)</option>
+                        <option value="Business Admin">Business Admin & Logistics (Requires: Analysis Tablet)</option>
+                        <option value="Medicine Track">Pre-Medicine Clinical Program (Requires: Medical Lab Gown)</option>
+                        <option value="Architecture Track">Structural Architecture Lab (Requires: Draft T-Square)</option>
+                    </select>
+                </div>
+
+                <button class="select-btn" style="width:100%; padding:12px;" onclick="sim.advanceToSocioQuestions()">Load Background Assessment System →</button>
+            </div>
+
+            <div id="creation-step-2" class="hidden">
+                <div style="background:#111420; padding:10px; border-radius:6px; margin-bottom:15px; font-size:11px; color:var(--accent-gold);" id="creation-step-indicator">Question 1 of 10</div>
+                <p id="recruit-query" style="font-weight:600; line-height:1.5; font-size:15px; margin:0 0 20px 0; color:#fff;"></p>
+                <div id="recruit-options"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEFT SIDEBAR HUD FRAMEWORK -->
+    <div id="hud-sidebar">
+        <div class="hud-section-header">Identity Node</div>
+        <div class="data-row">👤 <span id="hud-identity" style="color:var(--accent-gold); font-weight:bold;">...</span></div>
+        <div class="data-row" style="font-size:11px;">⚧️ Gender: <span id="hud-gender-display" style="color:#fff;">...</span></div>
+        <div class="data-row" style="font-size:11px;">🎓 <span id="hud-major" style="color:var(--neon-blue);">...</span></div>
+
+        <div class="hud-section-header">Temporal Matrix Phase</div>
+        <div class="data-row" style="background: #111420; border-color: var(--purple); font-weight: bold; text-align: center; display: block;">
+            📅 <span id="hud-time">Day 1</span> — <span id="hud-phase" style="color:var(--pink);">Morning</span>
+        </div>
+
+        <div class="hud-section-header">Financial Balance Matrix</div>
+        <div class="data-row">💵 Cash Cache: <span id="hud-cash" style="color:var(--emerald); font-weight:bold;">$0</span></div>
+        <div class="data-row">🚨 Outstanding Debt: <span id="hud-debt" style="color:var(--crimson); font-weight:bold;">$0</span></div>
+
+        <div class="hud-section-header">Player Attribute Trackers</div>
+        <div class="data-row">💪 Athleticism: <span id="hud-stat-athl" style="color:var(--accent-gold);">0</span></div>
+        <div class="data-row">🧠 Intellect: <span id="hud-stat-intl" style="color:var(--neon-blue);">0</span></div>
+        <div class="data-row">🗣️ Charisma: <span id="hud-stat-char" style="color:var(--pink);">0</span></div>
+
+        <div class="hud-section-header">Affiliation Standings</div>
+        <div class="data-row">🏛️ Greek Sector: <span id="hud-greek-house" style="color:var(--accent-gold); font-weight:bold;">None</span></div>
+        <div class="data-row">👑 Rank Tier: <span id="hud-greek-rank" style="color:#fff;">N/A</span></div>
+        <div class="data-row">📣 Fame Index: <span id="hud-fame" style="color:var(--purple);">0</span></div>
+
+        <div class="hud-section-header">Biological Vitality Systems</div>
+        <div class="stat-gauge-container">
+            <div style="display:flex; justify-content:space-between; font-size:11px;"><span>⚡ Stamina Reserve</span><span id="hud-energy">100</span></div>
+            <div class="progress-container"><div id="bar-energy" class="progress-bar" style="background:var(--accent-gold);"></div></div>
+        </div>
+        <div class="stat-gauge-container">
+            <div style="display:flex; justify-content:space-between; font-size:11px;"><span>🥳 Dopamine Joy Metric</span><span id="hud-joy">100</span></div>
+            <div class="progress-container"><div id="bar-joy" class="progress-bar" style="background:var(--pink);"></div></div>
+        </div>
+
+        <div class="hud-section-header">Inventory Stash</div>
+        <div class="data-row" style="font-size:11px;">💊 Pills: <span id="hud-inv-pills">0</span> | 🛡️ Condoms: <span id="hud-inv-condoms">0</span></div>
+        <div class="data-row" style="font-size:11px;">🚬 Cigarettes: <span id="hud-inv-cigs">0</span></div>
+        <div class="data-row" style="font-size:10px; display:block; color:var(--text-muted); line-height:1.3;">
+            Academic Items: <span id="hud-inv-academic" style="color:#fff; font-weight:500;">None</span><br>
+            Wants/Luxuries: <span id="hud-inv-wants" style="color:#fff; font-weight:500;">None</span>
+        </div>
+    </div>
+
+    <!-- CENTER WORKSPACE ENVIRONMENT -->
+    <div id="center-workspace">
+        <div id="map-nav-bar">
+            <button id="nav-lecture" class="nav-tab-btn active" onclick="sim.travel('lecture')">🏫 Lecture Complex</button>
+            <button id="nav-dorm" class="nav-tab-btn" onclick="sim.travel('dorm')">🏠 Residence Halls</button>
+            <button id="nav-clubs" class="nav-tab-btn" onclick="sim.travel('clubs')">🏆 Student Activities & Clubs</button>
+            <button id="nav-frat" class="nav-tab-btn" onclick="sim.travel('frat')">🔱 Fraternity Estate</button>
+            <button id="nav-sorority" class="nav-tab-btn" onclick="sim.travel('sorority')">✨ Sorority Mansion House</button>
+            <button id="nav-special" class="nav-tab-btn" onclick="sim.travel('special')">🏪 Commercial Outposts</button>
+        </div>
+
+        <div id="action-desk">
+            <!-- CONTRACEPTIVE CHOICE GATEWAY -->
+            <div id="contraceptive-modal-workspace" class="hidden sims-panel" style="border-color:var(--pink);">
+                <h4 style="margin:0 0 6px 0; color:var(--pink); font-size:16px;">🔞 Evening Alignment Choice Required</h4>
+                <p style="font-size:12px; margin:0 0 14px 0;">You have arrived at your destination hookup coordinate. Confirm protection parameters to authorize physical interactions.</p>
+                <div style="display:flex; flex-direction:column; gap:8px;" id="contraceptive-options-box"></div>
+            </div>
+
+            <!-- SIMS NPC LOOP WORKSPACE -->
+            <div id="sims-interaction-workspace" class="hidden sims-panel">
+                <h4 id="sims-npc-header" style="margin:0 0 4px 0; color:var(--accent-gold);">Sim Workspace</h4>
+                <div id="sims-npc-stats" style="font-size:11px; color:var(--text-muted); margin-bottom:12px;"></div>
+                <div class="sims-grid">
+                    <button class="sims-btn sims-friend" onclick="sim.fireSimsAction('friend_pos')">Friendly Chat (+)</button>
+                    <button class="sims-btn sims-love" onclick="sim.fireSimsAction('love_pos')">Flirt & Charm (+)</button>
+                    <button class="sims-btn sims-enemy" onclick="sim.fireSimsAction('enemy_pos')">Intimidate (+)</button>
+                    <button class="sims-btn sims-friend" style="opacity:0.6;" onclick="sim.fireSimsAction('friend_neg')">Bore Node (-)</button>
+                    <button class="sims-btn sims-love" style="opacity:0.6;" onclick="sim.fireSimsAction('love_neg')">Awkward Comment (-)</button>
+                    <button class="sims-btn sims-enemy" style="opacity:0.6;" onclick="sim.fireSimsAction('enemy_neg')">Insult Face (-)</button>
+                </div>
+                <button class="select-btn" style="width:100%; margin-top:12px; background:#334155; color:#fff;" onclick="sim.closeSimsWorkspace()">Disconnect</button>
+            </div>
+
+            <div style="border-bottom: 1px solid var(--panel-border); padding-bottom: 6px;">
+                <h3 id="desk-title" style="margin:0; font-size:15px; color:#fff;">Calibrating System Array...</h3>
+                <p id="desk-desc" style="margin:2px 0 0 0; color:var(--text-muted); font-size:11px;"></p>
+            </div>
+
+            <div id="action-nodes-container" style="display: flex; flex-direction: column; gap: 8px; flex-grow: 1; overflow-y: auto;"></div>
+            
+            <button class="select-btn" style="width:100%; background:#1e1b4b; border:1px solid #4338ca; color:#fff;" onclick="sim.progressTime()">Advance Time ⏳</button>
+        </div>
+
+        <div id="terminal-log">System terminal operational. Tracking structural metrics...</div>
+    </div>
+
+    <!-- RIGHT SIDEBAR: IPHONE ENV -->
+    <div id="phone-container">
+        <div id="iphone-handset" class="phone-body">
+            <div class="phone-screen">
+                <div class="dynamic-island"></div>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; padding:4px 8px 0 8px; color:#fff; font-weight:bold; z-index:20;">
+                    <span>9:41 📡</span>
+                    <span style="color:var(--emerald);">100% 🔋</span>
+                </div>
+
+                <div id="phone-display" class="phone-display-content"></div>
+
+                <div class="phone-dock">
+                    <div class="dock-btn" onclick="sim.bootApp('contacts')">👥 Contacts</div>
+                    <div class="dock-btn" onclick="sim.bootApp('home')">📱 Home</div>
+                    <div class="dock-btn" onclick="sim.bootApp('shop')">🛒 Shopping</div>
+                    <div class="dock-btn" onclick="sim.bootApp('schedule')">📅 Sched</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+const phases = ["Morning", "Afternoon", "Evening", "Night"];
+const npcRegistryDatabase = [];
+
+function buildNpcDatabase() {
+    const names = ["Marcus Vance", "Elena Mercer", "Devon Kincaid", "Chloe Rhodes", "Tristan Barrett", "Sienna Monroe", "Julian Sterling", "Amara Sinclair"];
+    names.forEach((name, idx) => {
+        npcRegistryDatabase.push({
+            id: idx + 1,
+            name: name,
+            gpa: (2.5 + (idx % 4) * 0.3).toFixed(2),
+            friendship: 0, romance: 0, enmity: 0,
+            looks: 60 + (idx * 5) % 35,
+            statusTrack: "Neutral Node"
+        });
+    });
+}
+buildNpcDatabase();
+
+const onboardingQuestions = [
+    { q: "1. Select your starting campus lifestyle housing arrangement allocation funding profile:", buttons: [{ text: "Premium luxury high-rise condo package ($200 cash, leaves you with $1,200 Debt).", impact: { cash: 200, debt: 1200, athl: 5 } }, { text: "Standard operational campus residential hall tier ($100 cash, leaves you with $400 Debt).", impact: { cash: 100, debt: 400, intl: 5 } }, { text: "Cooperative group house shared space matrix ($50 cash, leaves you with $0 Debt balance).", impact: { cash: 50, debt: 0, char: 5 } }] },
+    { q: "2. How do you divide your schedule on your opening day on campus?", buttons: [{ text: "Hit the campus wellness facility weight racks.", impact: { athl: 15 } }, { text: "Review the full structural course syllabus architecture.", impact: { intl: 15 } }, { text: "Introduce yourself to everyone in the main lounge area.", impact: { char: 15 } }] },
+    { q: "3. A peer challenges an assertion you made during a module seminar. What is your recourse?", buttons: [{ text: "Overpower their point using aggressive posture.", impact: { athl: 10 } }, { text: "Deconstruct their logic stream cleanly with research documentation.", impact: { intl: 15 } }, { text: "Defuse the tension with a lighthearted joke.", impact: { char: 10 } }] },
+    { q: "4. What type of extracurricular deployment matches your interest parameters?", buttons: [{ text: "The Varsity Athletic programs.", impact: { athl: 20 } }, { text: "The Competitive Debate Assembly and Council.", impact: { intl: 20 } }, { text: "The Social Event and Mixer Planning Committee.", impact: { char: 20 } }] },
+    { q: "5. You spot an explicit calculating error in your engineering mentor's presentation board. Your choice?", buttons: [{ text: "Keep silent and maintain physical composure.", impact: { athl: 5 } }, { text: "Approach the board discreetly with correction proofs.", impact: { intl: 15 } }, { text: "Announce it confidently with an engaging query.", impact: { char: 10 } }] },
+    { q: "6. How do you effectively manage exhaustion levels after extensive assignments?", buttons: [{ text: "Run circuit intervals around the sports perimeter.", impact: { athl: 15 } }, { text: "Process analytical chess puzzles and system readouts.", impact: { intl: 15 } }, { text: "Meet with an expansive crew at a local lounge spot.", impact: { char: 15 } }] },
+    { q: "7. An unexpected disagreement erupts outside the residential halls. How do you intervene?", buttons: [{ text: "Physically step in to separate both targets safely.", impact: { athl: 15 } }, { text: "Analyze the rules manual to arbitrate terms legally.", impact: { intl: 10 } }, { text: "Use silver-tongued rhetoric to calm both parameters.", impact: { char: 15 } }] },
+    { q: "8. Select a premium financial workspace package asset.", buttons: [{ text: "High Performance Fitness Core Kit & Subscriptions.", impact: { athl: 15 } }, { text: "Advanced Algorithmic Computational Sandbox Tools.", impact: { intl: 15 } }, { text: "Custom Tailored Executive Professional Attire.", impact: { char: 15 } }] },
+    { q: "9. What foundational legacy do you plan to manifest by graduation?", buttons: [{ text: "Break championship records within regional divisions.", impact: { athl: 20 } }, { text: "Publish peer-reviewed design papers within international files.", impact: { intl: 20 } }, { text: "Secure election victory as overall Student Body Lead.", impact: { char: 20 } }] },
+    { q: "10. How do you treat your private capital accumulation streams?", buttons: [{ text: "Invest heavily into nutrient resources and equipment.", impact: { athl: 10 } }, { text: "Acquire theoretical literature indexes and analytics books.", impact: { intl: 10 } }, { text: "Fund social dinners to expand networking vectors.", impact: { char: 15 } }] }
+];
+
+class StateMasterCampusSimulationEngine {
+    constructor() {
+        this.state = {
+            firstName: "Ara", lastName: "Marie", gender: "Female", major: "Civil Engineering",
+            day: 1, phase: 0, cash: 0, debt: 0, gpa: 2.50, famePoints: 0, energy: 100, maxEnergy: 100, joy: 100,
+            athleticism: 10, intellect: 10, charisma: 10,
+            greekAffiliation: "None", greekRankIndex: 0,
+            inventory: { pills: 0, condoms: 0, cigs: 0, academicItems: [], wantsItems: [] },
+            activeZone: "lecture", activeSwipeIndex: 0, activeSimsNpc: null, activeEveningHookup: null,
+            isPhoneHidden: false, currentQuizIndex: 0
+        };
+        this.currentActiveApp = "home";
+        this.greekRanks = ["Pledge Associate", "Active Chapter Brother/Sister", "Executive Council Master", "Supreme Archon Leader"];
+    }
+
+    init() {
+        this.renderQuizQuestion();
+    }
+
+    advanceToSocioQuestions() {
+        this.state.firstName = document.getElementById("char-first-name").value.trim() || "Ara";
+        this.state.lastName = document.getElementById("char-last-name").value.trim() || "Marie";
+        this.state.gender = document.getElementById("char-gender").value;
+        this.state.major = document.getElementById("char-major").value;
+        
+        document.getElementById("creation-step-1").classList.add("hidden");
+        document.getElementById("creation-step-2").classList.remove("hidden");
+    }
+
+    renderQuizQuestion() {
+        if(this.state.currentQuizIndex >= onboardingQuestions.length) {
+            document.getElementById("creation-overlay").classList.add("hidden");
+            this.travel("lecture");
+            this.bootApp("home");
+            this.syncUI();
+            this.log(`🚀 Matrix Loaded. Standby user ${this.state.firstName}. System operational.`);
+            return;
+        }
+
+        document.getElementById("creation-step-indicator").innerText = `Onboarding Evaluation Matrix: Phase ${this.state.currentQuizIndex + 1} of 10`;
+        const qData = onboardingQuestions[this.state.currentQuizIndex];
+        document.getElementById("recruit-query").innerText = qData.q;
+        
+        const optBox = document.getElementById("recruit-options");
+        optBox.innerHTML = "";
+        
+        qData.buttons.forEach(btnInfo => {
+            let b = document.createElement("button");
+            b.className = "quiz-choice-btn";
+            b.innerText = btnInfo.text;
+            b.onclick = () => {
+                if(btnInfo.impact.cash) this.state.cash += btnInfo.impact.cash;
+                if(btnInfo.impact.debt !== undefined) this.state.debt += btnInfo.impact.debt;
+                if(btnInfo.impact.athl) this.state.athleticism += btnInfo.impact.athl;
+                if(btnInfo.impact.intl) this.state.intellect += btnInfo.impact.intl;
+                if(btnInfo.impact.char) this.state.charisma += btnInfo.impact.char;
+                
+                this.state.currentQuizIndex++;
+                this.renderQuizQuestion();
+            };
+            optBox.appendChild(b);
+        });
+    }
+
+    togglePhoneHardware() {
+        const container = document.getElementById("phone-container");
+        this.state.isPhoneHidden = !this.state.isPhoneHidden;
+        if(this.state.isPhoneHidden) container.classList.add("collapsed");
+        else container.classList.remove("collapsed");
+    }
+
+    travel(zoneKey) {
+        this.state.activeZone = zoneKey;
+        document.querySelectorAll('#map-nav-bar .nav-tab-btn').forEach(b => b.classList.remove('active'));
+        const btn = document.getElementById(`nav-${zoneKey}`);
+        if(btn) btn.classList.add('active');
+        this.renderZoneActions();
+        this.syncUI();
+    }
+
+    getMajorRequiredItem() {
+        switch(this.state.major) {
+            case "Civil Engineering": return "Scientific Calculator";
+            case "Computer Science": return "High-Spec Laptop";
+            case "Fine Arts": return "Premium Sketchbook";
+            case "Business Admin": return "Analysis Tablet";
+            case "Medicine Track": return "Medical Lab Gown";
+            case "Architecture Track": return "Draft T-Square";
+            default: return "Course Syllabus Bundle";
+        }
+    }
+
+    renderZoneActions() {
+        const container = document.getElementById("action-nodes-container");
+        container.innerHTML = "";
+        document.getElementById("desk-title").innerText = `Facility Area: [${this.state.activeZone.toUpperCase()}]`;
+        document.getElementById("desk-desc").innerText = `Zone metrics active at temporal interval ${phases[this.state.phase]}.`;
+
+        let actions = [];
+        let req = this.getMajorRequiredItem();
+        let hasReq = this.state.inventory.academicItems.includes(req);
+
+        if (this.state.activeZone === "lecture") {
+            actions.push({ 
+                name: `Attend ${this.state.major} Seminar Series`, 
+                cost: 20, type: "class", 
+                desc: `Engage high-level core curriculum tasks. ${hasReq ? '✓ Materials Equipped (+25% Exp Bonus)' : `⚠️ Missing ${req}! Performance penalty active.`}` 
+            });
+        } else if (this.state.activeZone === "dorm") {
+            actions.push({ name: "Execute System Sleep Routine", cost: 0, type: "sleep", desc: "Flush exhaustion profiles back down to stable baseline." });
+        } else if (this.state.activeZone === "special") {
+            // RESTORED COMMERCIAL JOBS PIPELINE
+            actions.push({ name: "Shift: Barista & Beverage Operative", cost: 25, type: "job", earn: 60, payDebt: 20, desc: "Process local order matrices to earn $60 cash, auto-paying $20 toward your active debt load." });
+            actions.push({ name: "Shift: Logistics Stockroom Assistant", cost: 30, type: "job", earn: 80, payDebt: 30, desc: "Execute structural freight management to generate $80 liquid capital, paying $30 toward debt lines." });
+        } else if (this.state.activeZone === "clubs") {
+            actions.push({ name: "🏆 Student Council Cabinet Assembly", cost: 15, type: "club_activity", skill: "charisma", desc: "Debate budget layout lines to expand systemic Charisma and Fame indicators." });
+            actions.push({ name: "🗣️ Competitive Debate Assembly Lounge", cost: 15, type: "club_activity", skill: "intellect", desc: "Refine presentation architecture arrays to scale personal Intellect nodes." });
+            actions.push({ name: "⚽ Varsity Soccer Tactical Field Runs", cost: 20, type: "club_activity", skill: "athleticism", desc: "Condition cardiovascular stamina vectors dynamically via active field work." });
+            actions.push({ name: "🏀 Varsity Basketball Scrimmage Matrix", cost: 20, type: "club_activity", skill: "athleticism", desc: "Run playbook spatial coordination routes to expand overall agility records." });
+            actions.push({ name: "🏐 Varsity Volleyball Net Workout", cost: 20, type: "club_activity", skill: "athleticism", desc: "Coordinate jumping trajectories and target spikes on the main athletic courts." });
+            actions.push({ name: "🏇 Championship Polo Equine Drills", cost: 25, type: "club_activity", skill: "athleticism", desc: "Ride tactical formations to shift team positions up in regional polo standings." });
+        } else if (this.state.activeZone === "frat" || this.state.activeZone === "sorority") {
+            // RESTORED GREEK AFFILIATION MANAGEMENT LOOPS
+            let correctZone = (this.state.gender === "Female" && this.state.activeZone === "sorority") || (this.state.gender === "Male" && this.state.activeZone === "frat") || (this.state.gender === "Non-Binary");
+            let allianceName = this.state.activeZone === "frat" ? "Sigma Phi Omega Fraternity" : "Kappa Delta Alpha Sorority";
+
+            if (this.state.greekAffiliation === "None") {
+                if (correctZone) {
+                    actions.push({ name: `Submit Pledge Intent Checklist to ${allianceName}`, cost: 15, type: "greek_join", house: allianceName, desc: "Enlist within the tier hierarchy track as an unverified Pledge Associate node." });
+                } else {
+                    actions.push({ name: "Request Guest Security Pass", cost: 10, type: "greek_guest", desc: "Tour the exterior lounge zones of this separate affiliation house." });
+                }
+            } else if (this.state.greekAffiliation === allianceName) {
+                let currentRank = this.greekRanks[this.state.greekRankIndex];
+                actions.push({ name: `Fulfill Internal Chapter Assignment [Tier: ${currentRank}]`, cost: 20, type: "greek_work", desc: "Contribute labor vectors to secure higher standing within your chapterhouse matrix." });
+                if (this.state.greekRankIndex < this.greekRanks.length - 1) {
+                    actions.push({ name: `Petition for Elevation to Next Rank Vector`, cost: 10, type: "greek_promote", desc: "Undergo behavioral performance evaluation to climb the executive leadership hierarchy." });
+                }
+            } else {
+                actions.push({ name: "Initiate Rival Cross-Chapter Banter Matrix", cost: 20, type: "greek_rival", desc: "Engage in rhetorical sparring against alternative chapter operations." });
+            }
+        }
+
+        // SEED SYSTEM ENCOUNTERS
+        let seedNpc = npcRegistryDatabase[Math.floor(Math.abs(this.state.day * 5 + this.state.phase) % npcRegistryDatabase.length)];
+        actions.push({
+            name: `Approach Target Entity: ${seedNpc.name}`,
+            cost: 10, type: "meet_npc", targetNpc: seedNpc,
+            desc: `Open communication pipeline vectors directly using active Sims conversational array metrics.`
+        });
+
+        actions.forEach(act => {
+            let n = document.createElement("div");
+            n.className = "action-node";
+            n.innerHTML = `
+                <div style="max-width:75%;">
+                    <strong style="color:#fff;">${act.name}</strong><br><small style="color:var(--text-muted);">${act.desc}</small><br>
+                    <small style="color:var(--crimson); font-weight:bold;">Energy Cost: -${act.cost}</small>
+                </div>
+                <button class="select-btn" onclick='sim.runAction(${JSON.stringify(act)})'>Select</button>
+            `;
+            container.appendChild(n);
+        });
+    }
+
+    runAction(act) {
+        if (this.state.energy < act.cost) return this.log("❌ Stamina resource check verification failed.");
+        this.state.energy -= act.cost;
+
+        if (act.type === "class") {
+            let req = this.getMajorRequiredItem();
+            let boost = this.state.inventory.academicItems.includes(req) ? 0.12 : 0.06;
+            this.state.gpa = Math.min(4.00, this.state.gpa + boost);
+            this.log(`📚 Academic file logs synchronized. GPA tracked upward by ${boost}.`);
+            this.progressTime();
+        } else if (act.type === "sleep") {
+            this.state.energy = this.state.maxEnergy;
+            this.log("🏠 Sleep routine concluded successfully. Biological systems fully refreshed.");
+            this.progressTime();
+        } else if (act.type === "job") {
+            this.state.cash += act.earn;
+            let actualDebtPayment = Math.min(this.state.debt, act.payDebt);
+            this.state.debt -= actualDebtPayment;
+            this.log(`💵 Labor node executed. Generated +$${act.earn} Liquid. Debt principal auto-reduced by $${actualDebtPayment}.`);
+            this.progressTime();
+        } else if (act.type === "club_activity") {
+            if(act.skill === "athleticism") this.state.athleticism += 6;
+            if(act.skill === "intellect") this.state.intellect += 6;
+            if(act.skill === "charisma") this.state.charisma += 6;
+            this.state.famePoints += 10;
+            this.log(`🏆 Completed activity item: ${act.name}. Individual metrics boosted.`);
+            this.progressTime();
+        } else if (act.type === "greek_join") {
+            this.state.greekAffiliation = act.house;
+            this.state.greekRankIndex = 0;
+            this.state.famePoints += 25;
+            this.log(`🔱 SYSTEM AFFILIATION GRANTED: Enlisted in ${act.house} under entry-level Rank: Pledge Associate.`);
+            this.progressTime();
+        } else if (act.type === "greek_work") {
+            this.state.famePoints += 15;
+            this.state.joy = Math.max(0, this.state.joy - 12);
+            this.log("🔱 Executed house infrastructure operations. Gained prominence in active chapter logs.");
+            this.progressTime();
+        } else if (act.type === "greek_promote") {
+            if(this.state.famePoints >= (this.state.greekRankIndex + 1) * 40) {
+                this.state.greekRankIndex++;
+                this.log(`👑 ELEVATION GRANTED: Advanced clean through organizational ranks to: [${this.greekRanks[this.state.greekRankIndex]}].`);
+            } else {
+                this.log("❌ Elevation denied: Fame index evaluation levels are insufficient to authorize next rank.");
+            }
+        } else if (act.type === "greek_guest" || act.type === "greek_rival") {
+            this.log("🔱 Handled cross-house networking protocols across local territory layout boundaries.");
+            this.progressTime();
+        } else if (act.type === "meet_npc") {
+            this.openSimsWorkspace(act.targetNpc);
+        }
+        this.syncUI();
+    }
+
+    openSimsWorkspace(npc) {
+        this.state.activeSimsNpc = npc;
+        document.getElementById("sims-interaction-workspace").classList.remove("hidden");
+        document.getElementById("sims-npc-header").innerText = `🎯 Live Sub-Display Channel: [${npc.name}]`;
+        this.refreshSimsWorkspaceStats();
+    }
+
+    refreshSimsWorkspaceStats() {
+        let npc = this.state.activeSimsNpc;
+        if(!npc) return;
+        document.getElementById("sims-npc-stats").innerHTML = `
+            Relationship Tracker Maps: 
+            <span style="color:var(--emerald);">Friendship: ${npc.friendship}%</span> | 
+            <span style="color:var(--pink);">Romance: ${npc.romance}%</span> | 
+            <span style="color:var(--crimson);">Enmity Level: ${npc.enmity}%</span>
+            <br>Current Classification Vector: <strong style="color:#fff;">[${npc.statusTrack}]</strong>
+        `;
+    }
+
+    fireSimsAction(actionType) {
+        let npc = this.state.activeSimsNpc;
+        if(!npc) return;
+
+        if(this.state.energy < 10) return this.log("❌ Energy parameters insufficient.");
+        this.state.energy -= 10;
+
+        switch(actionType) {
+            case "friend_pos": npc.friendship = Math.min(100, npc.friendship + 15); this.log(`🗣️ Synced chat logs with ${npc.name}.`); break;
+            case "friend_neg": npc.friendship = Math.max(0, npc.friendship - 10); this.log(`🗣️ Interface stalled out via lackluster conversational flow.`); break;
+            case "love_pos": npc.romance = Math.min(100, npc.romance + 15); this.log(`🔥 Cast charismatic attraction vectors toward ${npc.name}.`); break;
+            case "love_neg": npc.romance = Math.max(0, npc.romance - 10); this.log(`🔥 Conversation slipped into an awkward mismatch sequence.`); break;
+            case "enemy_pos": npc.enmity = Math.min(100, npc.enmity + 20); this.log(`🚨 Asserted authority over ${npc.name}. Conflict parameters expanded.`); break;
+            case "enemy_neg": npc.enmity = Math.max(0, npc.enmity - 10); this.log(`🚨 Psychological friction deployment missed target.`); break;
+        }
+
+        if(npc.enmity >= 40) npc.statusTrack = "Declared Adversary Enemy";
+        else if(npc.romance >= 40) npc.statusTrack = "Primary Love Interest";
+        else if(npc.friendship >= 40) npc.statusTrack = "Verified Personal Contact";
+        else npc.statusTrack = "Neutral Acquaintance";
+
+        this.refreshSimsWorkspaceStats();
+        this.syncUI();
+        this.bootApp(this.currentActiveApp);
+    }
+
+    closeSimsWorkspace() {
+        this.state.activeSimsNpc = null;
+        document.getElementById("sims-interaction-workspace").classList.add("hidden");
+        this.progressTime();
+    }
+
+    progressTime() {
+        this.state.phase++;
+        if(this.state.phase >= phases.length) {
+            this.state.phase = 0;
+            this.state.day++;
+        }
+
+        if(phases[this.state.phase] === "Night" && this.state.activeEveningHookup) {
+            this.openContraceptiveSelectionInterface();
+            return; 
+        }
+
+        this.syncUI();
+        this.renderZoneActions();
+        this.bootApp(this.currentActiveApp);
+    }
+
+    openContraceptiveSelectionInterface() {
+        const workspace = document.getElementById("contraceptive-modal-workspace");
+        const optionsBox = document.getElementById("contraceptive-options-box");
+        
+        workspace.classList.remove("hidden");
+        optionsBox.innerHTML = "";
+
+        let btnRaw = document.createElement("button");
+        btnRaw.className = "quiz-choice-btn";
+        btnRaw.style.borderColor = "var(--crimson)";
+        btnRaw.innerText = "❌ Execute Raw Unprotected Path (Extreme Biological Vulnerability)";
+        btnRaw.onclick = () => sim.resolveHookupInteraction("raw");
+        optionsBox.appendChild(btnRaw);
+
+        if(this.state.inventory.pills > 0) {
+            let btnPill = document.createElement("button");
+            btnPill.className = "quiz-choice-btn";
+            btnPill.style.borderColor = "var(--purple)";
+            btnPill.innerText = `💊 Administer Oral Birth Control Pill (Stash Count: ${this.state.inventory.pills})`;
+            btnPill.onclick = () => sim.resolveHookupInteraction("pill");
+            optionsBox.appendChild(btnPill);
+        }
+
+        if(this.state.inventory.condoms > 0) {
+            let btnCondom = document.createElement("button");
+            btnCondom.className = "quiz-choice-btn";
+            btnCondom.style.borderColor = "var(--neon-blue)";
+            btnCondom.innerText = `🛡️ Deploy Premium Protective Latex Barrier (Stash Count: ${this.state.inventory.condoms})`;
+            btnCondom.onclick = () => sim.resolveHookupInteraction("condom");
+            optionsBox.appendChild(btnCondom);
+        }
+    }
+
+    resolveHookupInteraction(choiceType) {
+        let partner = this.state.activeEveningHookup;
+        document.getElementById("contraceptive-modal-workspace").classList.add("hidden");
+        this.state.joy = 100;
+
+        if(choiceType === "raw") {
+            this.log(`🔞 intimacies logged RAW with ${partner.name}. High evolutionary vulnerability indexes triggered.`);
+        } else if(choiceType === "pill") {
+            this.state.inventory.pills--;
+            this.log(`🔞 Processed clean contact sequence with ${partner.name} using oral chemical protection counters.`);
+        } else if(choiceType === "condom") {
+            this.state.inventory.condoms--;
+            this.log(`🔞 Finalized secure contact encounter with ${partner.name} under structural latex barriers.`);
+        }
+
+        this.state.activeEveningHookup = null;
+        this.syncUI();
+        this.progressTime();
+    }
+
+    /* ADVANCED APP GRID PLATFORMS */
+    bootApp(appName) {
+        this.currentActiveApp = appName;
+        const display = document.getElementById("phone-display");
+        display.innerHTML = "";
+
+        if(appName === "home") {
+            display.innerHTML = `
+                <div class="phone-app-grid">
+                    <div onclick="sim.bootApp('stats')"><div class="iphone-icon-large">📊</div><span class="app-lbl">Metrics</span></div>
+                    <div onclick="sim.bootApp('spark')"><div class="iphone-icon-large">🔥</div><span class="app-lbl">Spark App</span></div>
+                    <div onclick="sim.bootApp('shop')"><div class="iphone-icon-large">🛒</div><span class="app-lbl">MegaShop</span></div>
+                    <div onclick="sim.bootApp('contacts')"><div class="iphone-icon-large">👥</div><span class="app-lbl">Channels</span></div>
+                    
+                    <div><div class="iphone-icon-large" style="opacity:0.2;">⚙️</div><span class="app-lbl">Configs</span></div>
+                    <div><div class="iphone-icon-large" style="opacity:0.2;">🗺️</div><span class="app-lbl">Gps Meta</span></div>
+                    <div><div class="iphone-icon-large" style="opacity:0.2;">🎵</div><span class="app-lbl">Audio</span></div>
+                    <div><div class="iphone-icon-large" style="opacity:0.2;">📩</div><span class="app-lbl">Mail</span></div>
+                    <div><div class="iphone-icon-large" style="opacity:0.2;">🛡️</div><span class="app-lbl">Vault Security</span></div>
+                </div>`;
+            return;
+        }
+
+        switch(appName) {
+            case "shop":
+                // COMPLETE ONGOING SHOPPING SYSTEM INTEGRATION
+                let dynamicMajorReq = this.getMajorRequiredItem();
+                display.innerHTML = `
+                    <div class="app-container">
+                        <h4 style="margin:0 0 8px 0; color:var(--emerald);">🛒 ONE-TAP CAMPUS COMMERCE</h4>
+                        <div style="overflow-y:auto; flex-grow:1; padding-right:2px;">
+                            <div style="font-size:10px; text-transform:uppercase; color:var(--neon-blue); margin-bottom:6px; font-weight:bold;">📍 Major Core Needs</div>
+                            <div class="shop-row">
+                                <div><strong>${dynamicMajorReq}</strong><br><small style="color:var(--text-muted);">$120 • Major Asset</small></div>
+                                <button class="select-btn" style="padding:4px 10px; font-size:10px;" onclick="sim.executeOnlinePurchase('academic', '${dynamicMajorReq}', 120)">Buy</button>
+                            </div>
+
+                            <div style="font-size:10px; text-transform:uppercase; color:var(--accent-gold); margin:10px 0 6px 0; font-weight:bold;">📍 Personal Luxuries & Wants</div>
+                            <div class="shop-row">
+                                <div><strong>Designer Varsity Fit</strong><br><small style="color:var(--text-muted);">$250 • Boosts Fame</small></div>
+                                <button class="select-btn" style="padding:4px 10px; font-size:10px;" onclick="sim.executeOnlinePurchase('wants', 'Designer Varsity Fit', 250)">Buy</button>
+                            </div>
+                            <div class="shop-row">
+                                <div><strong>Premium Vape Rig</strong><br><small style="color:var(--text-muted);">$90 • Stress Management</small></div>
+                                <button class="select-btn" style="padding:4px 10px; font-size:10px;" onclick="sim.executeOnlinePurchase('wants', 'Premium Vape Rig', 90)">Buy</button>
+                            </div>
+
+                            <div style="font-size:10px; text-transform:uppercase; color:var(--pink); margin:10px 0 6px 0; font-weight:bold;">📍 Protection Loadout & Consumables</div>
+                            <div class="shop-row">
+                                <div><strong>Oral Birth Control Pills</strong><br><small style="color:var(--text-muted);">$40 • Stash Counter</small></div>
+                                <button class="select-btn" style="padding:4px 10px; font-size:10px;" onclick="sim.executeOnlinePurchase('pills', null, 40)">Buy</button>
+                            </div>
+                            <div class="shop-row">
+                                <div><strong>Latex Condom Pack</strong><br><small style="color:var(--text-muted);">$15 • Barrier Loadout</small></div>
+                                <button class="select-btn" style="padding:4px 10px; font-size:10px;" onclick="sim.executeOnlinePurchase('condoms', null, 15)">Buy</button>
+                            </div>
+                            <div class="shop-row">
+                                <div><strong>Pack of Cigarettes</strong><br><small style="color:var(--text-muted);">$12 • Consumable Stash</small></div>
+                                <button class="select-btn" style="padding:4px 10px; font-size:10px;" onclick="sim.executeOnlinePurchase('cigs', null, 12)">Buy</button>
+                            </div>
+                        </div>
+                    </div>`;
+                break;
+
+            case "contacts":
+                let visibleContacts = npcRegistryDatabase.filter(n => n.friendship >= 30);
+                if(visibleContacts.length === 0) {
+                    display.innerHTML = `
+                        <div class="app-container" style="text-align:center; justify-content:center;">
+                            <div style="font-size:32px; margin-bottom:8px;">🔒</div>
+                            <strong style="color:var(--text-muted);">Channels Encrypted</strong>
+                            <p style="font-size:10px; color:var(--text-muted); padding:0 8px;">Reach 30% friendship status with local campus actors to establish standard phone connection links.</p>
+                        </div>`;
+                } else {
+                    let rows = visibleContacts.map(c => `
+                        <div style="background:#111420; padding:8px; border-radius:6px; margin-bottom:6px; border-left:3px solid var(--emerald);">
+                            <strong>${c.name}</strong><br>
+                            <small style="color:var(--accent-gold);">F: ${c.friendship}% | L: ${c.romance}% | Class: ${c.statusTrack}</small>
+                        </div>
+                    `).join("");
+                    display.innerHTML = `
+                        <div class="app-container"><h4 style="margin:0 0 10px 0; color:var(--neon-blue);">👥 AUTHENTICATED CHANNELS</h4><div style="overflow-y:auto; flex-grow:1;">${rows}</div></div>`;
+                }
+                break;
+
+            case "schedule":
+                display.innerHTML = `
+                    <div class="app-container">
+                        <h4 style="margin:0 0 10px 0; color:var(--purple);">📅 MATRIX LOGISTICS</h4>
+                        <div style="background:#111420; padding:10px; border-radius:6px; font-size:11px; line-height:1.5;">
+                            • Morning: Core Lecture Assemblies.<br>
+                            • Afternoon: Workspace Action Matrix Loops.<br>
+                            • Evening: Social Territory Mixing Options.<br>
+                            • Night: System Alignment Processing.
+                        </div>
+                    </div>`;
+                break;
+
+            case "stats":
+                display.innerHTML = `
+                    <div class="app-container">
+                        <h4 style="margin:0 0 10px 0; color:var(--accent-gold);">📊 DISCIPLINE LOGISTICS</h4>
+                        <p style="margin:4px 0;">Major Profile: <strong style="color:var(--neon-blue);">${this.state.major}</strong></p>
+                        <p style="margin:4px 0;">Athleticism Index: <strong>${this.state.athleticism}</strong></p>
+                        <p style="margin:4px 0;">Cognitive Performance: <strong>${this.state.intellect}</strong></p>
+                        <p style="margin:4px 0;">Social Rhetoric: <strong>${this.state.charisma}</strong></p>
+                        <hr style="border-color:var(--panel-border); margin:8px 0;">
+                        <p style="margin:4px 0; color:var(--emerald);">Liquid Holdings: $${this.state.cash}</p>
+                        <p style="margin:4px 0; color:var(--crimson);">Active Debt Matrix: $${this.state.debt}</p>
+                    </div>`;
+                break;
+
+            case "spark":
+                let match = npcRegistryDatabase[this.state.activeSwipeIndex % npcRegistryDatabase.length];
+                display.innerHTML = `
+                    <div class="app-container">
+                        <h4 style="margin:0 0 10px 0; color:var(--pink);">🔥 SPARK MATCH SEEKER</h4>
+                        <div style="background:#111; padding:12px; border-radius:8px; text-align:center;">
+                            <div style="font-size:32px;">👤</div>
+                            <strong>${match.name}</strong><br>
+                            <small style="color:var(--accent-gold);">Attraction Quotient: ${match.looks}%</small>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:10px;">
+                                <button class="select-btn" style="background:#475569; color:#fff;" onclick="sim.swipeLeft()">Pass</button>
+                                <button class="select-btn" style="background:var(--pink); color:#fff;" onclick="sim.swipeRight(${match.id})">Select</button>
+                            </div>
+                        </div>
+                    </div>`;
+                break;
+        }
+    }
+
+    executeOnlinePurchase(category, itemName, cost) {
+        if(this.state.cash < cost) {
+            this.log("❌ Core checkout transaction blocked: Insufficient liquid cash cache.");
+            return;
+        }
+        this.state.cash -= cost;
+
+        if(category === "pills") {
+            this.state.inventory.pills++;
+            this.log("🛒 Checkout Complete: Stashed 1x Oral Contraceptive configuration.");
+        } else if(category === "condoms") {
+            this.state.inventory.condoms++;
+            this.log("🛒 Checkout Complete: Stashed 1x Protective Latex Barrier setup.");
+        } else if(category === "cigs") {
+            this.state.inventory.cigs++;
+            this.state.joy = Math.min(100, this.state.joy + 15);
+            this.log("🛒 Checkout Complete: Added 1x Cigarette pack to inventory loadout.");
+        } else if(category === "academic") {
+            if(!this.state.inventory.academicItems.includes(itemName)) {
+                this.state.inventory.academicItems.push(itemName);
+                this.log(`🛒 Checkout Complete: Acquired required structural coursework hardware: [${itemName}].`);
+            } else {
+                this.log(`⚠️ Redundant action trace: You already possess the [${itemName}] asset.`);
+            }
+        } else if(category === "wants") {
+            this.state.inventory.wantsItems.push(itemName);
+            if(itemName === "Designer Varsity Fit") this.state.famePoints += 40;
+            this.log(`🛒 Checkout Complete: Delivered personal luxury item asset: [${itemName}].`);
+        }
+
+        this.syncUI();
+        this.renderZoneActions();
+        this.bootApp("shop");
+    }
+
+    swipeLeft() { this.state.activeSwipeIndex++; this.bootApp("spark"); }
+    swipeRight(id) {
+        let target = npcRegistryDatabase.find(n => n.id === id);
+        this.state.activeEveningHookup = target;
+        this.log(`✨ Link established: Communication pipeline synchronized with ${target.name} for evening parameters.`);
+        this.state.activeSwipeIndex++;
+        this.bootApp("spark");
+    }
+
+    log(msg) {
+        const logger = document.getElementById("terminal-log");
+        logger.innerHTML += `<br> >> ${msg}`;
+        logger.scrollTop = logger.scrollHeight;
+    }
+
+    syncUI() {
+        document.getElementById("hud-identity").innerText = `${this.state.firstName} ${this.state.lastName}`;
+        document.getElementById("hud-gender-display").innerText = this.state.gender;
+        document.getElementById("hud-major").innerText = this.state.major;
+        document.getElementById("hud-time").innerText = `Day ${this.state.day}`;
+        document.getElementById("hud-phase").innerText = phases[this.state.phase];
+        document.getElementById("hud-gpa").innerText = this.state.gpa.toFixed(2);
+        document.getElementById("hud-fame").innerText = this.state.famePoints;
+        document.getElementById("hud-cash").innerText = `$${this.state.cash}`;
+        document.getElementById("hud-debt").innerText = `$${this.state.debt}`;
+        document.getElementById("hud-energy").innerText = this.state.energy;
+        document.getElementById("bar-energy").style.width = `${this.state.energy}%`;
+        document.getElementById("hud-joy").innerText = this.state.joy;
+        document.getElementById("bar-joy").style.width = `${this.state.joy}%`;
+        
+        document.getElementById("hud-stat-athl").innerText = this.state.athleticism;
+        document.getElementById("hud-stat-intl").innerText = this.state.intellect;
+        document.getElementById("hud-stat-char").innerText = this.state.charisma;
+        
+        document.getElementById("hud-greek-house").innerText = this.state.greekAffiliation;
+        document.getElementById("hud-greek-rank").innerText = this.state.greekAffiliation !== "None" ? this.greekRanks[this.state.greekRankIndex] : "N/A";
+
+        document.getElementById("hud-inv-pills").innerText = this.state.inventory.pills;
+        document.getElementById("hud-inv-condoms").innerText = this.state.inventory.condoms;
+        document.getElementById("hud-inv-cigs").innerText = this.state.inventory.cigs;
+
+        document.getElementById("hud-inv-academic").innerText = this.state.inventory.academicItems.length > 0 ? this.state.inventory.academicItems.join(", ") : "None";
+        document.getElementById("hud-inv-wants").innerText = this.state.inventory.wantsItems.length > 0 ? this.state.inventory.wantsItems.join(", ") : "None";
+    }
+}
+
+const sim = new StateMasterCampusSimulationEngine();
+window.onload = () => sim.init();
+</script>
+</body>
+</html>
