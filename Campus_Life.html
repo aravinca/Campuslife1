@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Institutional Matrix: Advanced Campus Engine</title>
+    <title>Campus Entrance Exam</title>
     <style>
         :root {
             --bg-dark: #030305;
@@ -145,7 +145,7 @@
 
 <div id="game-layout">
 
-    <button id="phone-toggle-tab" onclick="sim.togglePhoneHardware()">📱 Toggle Phone Interface</button>
+    <button id="phone-toggle-tab" onclick="sim.togglePhoneHardware()">📱 Phone </button>
 
     <!-- IDENTITY FORMATION ARCHITECTURE OVERLAY -->
     <div id="creation-overlay">
@@ -163,11 +163,11 @@
                         <input type="text" id="char-last-name" value="Marie" style="background:#111420; border:1px solid var(--panel-border); padding:10px; color:#fff; border-radius:6px;">
                     </div>
                     <div class="stat-gauge-container">
-                        <label style="font-size:11px; text-transform:uppercase; color:var(--text-muted);">Gender Matrix</label>
+                        <label style="font-size:11px; text-transform:uppercase; color:var(--text-muted);">Gender</label>
                         <select id="char-gender" style="background:#111420; border:1px solid var(--panel-border); padding:10px; color:#fff; border-radius:6px;">
-                            <option value="Female">Female Identity</option>
-                            <option value="Male">Male Identity</option>
-                            <option value="Non-Binary">Non-Binary Array</option>
+                            <option value="Female">Female</option>
+                            <option value="Male">Male</option>
+                            <option value="Non-Binary">Non-Binary</option>
                         </select>
                     </div>
                 </div>
@@ -175,16 +175,16 @@
                 <div class="stat-gauge-container" style="margin-bottom:25px;">
                     <label style="font-size:11px; text-transform:uppercase; color:var(--text-muted);">Academic Discipline Major</label>
                     <select id="char-major" style="background:#111420; border:1px solid var(--panel-border); padding:10px; color:#fff; border-radius:6px; width:100%;">
-                        <option value="Civil Engineering">Civil Engineering Core (Requires: Calculator, Protractor)</option>
-                        <option value="Computer Science">Computer Science Systems (Requires: High-Spec Laptop)</option>
-                        <option value="Fine Arts">Fine Arts & Aesthetics Theory (Requires: Premium Sketchbook)</option>
-                        <option value="Business Admin">Business Admin & Logistics (Requires: Analysis Tablet)</option>
-                        <option value="Medicine Track">Pre-Medicine Clinical Program (Requires: Medical Lab Gown)</option>
-                        <option value="Architecture Track">Structural Architecture Lab (Requires: Draft T-Square)</option>
+                        <option value="Civil Engineering">Engineering Core</option>
+                        <option value="Computer Science">Computer Science Systems</option>
+                        <option value="Fine Arts">Fine Arts & Aesthetic Theory</option>
+                        <option value="Business Admin">Business Admin</option>
+                        <option value="Medicine Track">Pre-Medicine</option>
+                        <option value="Architecture Track">Structural Architecture Lab</option>
                     </select>
                 </div>
 
-                <button class="select-btn" style="width:100%; padding:12px;" onclick="sim.advanceToSocioQuestions()">Load Background Assessment System →</button>
+                <button class="select-btn" style="width:100%; padding:12px;" onclick="sim.advanceToSocioQuestions()">Background Assessment Questionare →</button>
             </div>
 
             <div id="creation-step-2" class="hidden">
@@ -207,21 +207,21 @@
             📅 <span id="hud-time">Day 1</span> — <span id="hud-phase" style="color:var(--pink);">Morning</span>
         </div>
 
-        <div class="hud-section-header">Financial Balance Matrix</div>
+        <div class="hud-section-header">Financial Balance</div>
         <div class="data-row">💵 Cash Cache: <span id="hud-cash" style="color:var(--emerald); font-weight:bold;">$0</span></div>
         <div class="data-row">🚨 Outstanding Debt: <span id="hud-debt" style="color:var(--crimson); font-weight:bold;">$0</span></div>
 
-        <div class="hud-section-header">Player Attribute Trackers</div>
+        <div class="hud-section-header">Player Attributes</div>
         <div class="data-row">💪 Athleticism: <span id="hud-stat-athl" style="color:var(--accent-gold);">0</span></div>
         <div class="data-row">🧠 Intellect: <span id="hud-stat-intl" style="color:var(--neon-blue);">0</span></div>
         <div class="data-row">🗣️ Charisma: <span id="hud-stat-char" style="color:var(--pink);">0</span></div>
 
-        <div class="hud-section-header">Affiliation Standings</div>
+        <div class="hud-section-header">Affiliations</div>
         <div class="data-row">🏛️ Greek Sector: <span id="hud-greek-house" style="color:var(--accent-gold); font-weight:bold;">None</span></div>
         <div class="data-row">👑 Rank Tier: <span id="hud-greek-rank" style="color:#fff;">N/A</span></div>
         <div class="data-row">📣 Fame Index: <span id="hud-fame" style="color:var(--purple);">0</span></div>
 
-        <div class="hud-section-header">Biological Vitality Systems</div>
+        <div class="hud-section-header">Vitality</div>
         <div class="stat-gauge-container">
             <div style="display:flex; justify-content:space-between; font-size:11px;"><span>⚡ Stamina Reserve</span><span id="hud-energy">100</span></div>
             <div class="progress-container"><div id="bar-energy" class="progress-bar" style="background:var(--accent-gold);"></div></div>
@@ -243,9 +243,9 @@
     <!-- CENTER WORKSPACE ENVIRONMENT -->
     <div id="center-workspace">
         <div id="map-nav-bar">
-            <button id="nav-lecture" class="nav-tab-btn active" onclick="sim.travel('lecture')">🏫 Lecture Complex</button>
-            <button id="nav-dorm" class="nav-tab-btn" onclick="sim.travel('dorm')">🏠 Residence Halls</button>
-            <button id="nav-clubs" class="nav-tab-btn" onclick="sim.travel('clubs')">🏆 Student Activities & Clubs</button>
+            <button id="nav-lecture" class="nav-tab-btn active" onclick="sim.travel('lecture')">🏫 Lecture Wing</button>
+            <button id="nav-dorm" class="nav-tab-btn" onclick="sim.travel('dorm')">🏠 Dormitories</button>
+            <button id="nav-clubs" class="nav-tab-btn" onclick="sim.travel('clubs')">🏆 Student Union Building</button>
             <button id="nav-frat" class="nav-tab-btn" onclick="sim.travel('frat')">🔱 Fraternity Estate</button>
             <button id="nav-sorority" class="nav-tab-btn" onclick="sim.travel('sorority')">✨ Sorority Mansion House</button>
             <button id="nav-special" class="nav-tab-btn" onclick="sim.travel('special')">🏪 Commercial Outposts</button>
@@ -332,22 +332,22 @@ function buildNpcDatabase() {
 buildNpcDatabase();
 
 const onboardingQuestions = [
-    { q: "1. Select your starting campus lifestyle housing arrangement allocation funding profile:", buttons: [{ text: "Premium luxury high-rise condo package ($200 cash, leaves you with $1,200 Debt).", impact: { cash: 200, debt: 1200, athl: 5 } }, { text: "Standard operational campus residential hall tier ($100 cash, leaves you with $400 Debt).", impact: { cash: 100, debt: 400, intl: 5 } }, { text: "Cooperative group house shared space matrix ($50 cash, leaves you with $0 Debt balance).", impact: { cash: 50, debt: 0, char: 5 } }] },
-    { q: "2. How do you divide your schedule on your opening day on campus?", buttons: [{ text: "Hit the campus wellness facility weight racks.", impact: { athl: 15 } }, { text: "Review the full structural course syllabus architecture.", impact: { intl: 15 } }, { text: "Introduce yourself to everyone in the main lounge area.", impact: { char: 15 } }] },
+    { q: "1. What family are you born in?:", buttons: [{ text: "Wealthy Class Family.", impact: { cash: 2000, debt: 0, athl: 0 } }, { text: "Midle Class Family.", impact: { cash: 100, debt: 400, intl: 0 } }, { text: "Low Class Family .", impact: { cash: 50, debt: 2500, char: 0 } }] },
+    { q: "2. How do you divide your schedule on your opening day on campus?", buttons: [{ text: "Hit the campus gym.", impact: { athl: 4 } }, { text: "Review the full course syllabus.", impact: { intl: 4 } }, { text: "Meet New Friends.", impact: { char: 4 } }] },
     { q: "3. A peer challenges an assertion you made during a module seminar. What is your recourse?", buttons: [{ text: "Overpower their point using aggressive posture.", impact: { athl: 10 } }, { text: "Deconstruct their logic stream cleanly with research documentation.", impact: { intl: 15 } }, { text: "Defuse the tension with a lighthearted joke.", impact: { char: 10 } }] },
-    { q: "4. What type of extracurricular deployment matches your interest parameters?", buttons: [{ text: "The Varsity Athletic programs.", impact: { athl: 20 } }, { text: "The Competitive Debate Assembly and Council.", impact: { intl: 20 } }, { text: "The Social Event and Mixer Planning Committee.", impact: { char: 20 } }] },
-    { q: "5. You spot an explicit calculating error in your engineering mentor's presentation board. Your choice?", buttons: [{ text: "Keep silent and maintain physical composure.", impact: { athl: 5 } }, { text: "Approach the board discreetly with correction proofs.", impact: { intl: 15 } }, { text: "Announce it confidently with an engaging query.", impact: { char: 10 } }] },
-    { q: "6. How do you effectively manage exhaustion levels after extensive assignments?", buttons: [{ text: "Run circuit intervals around the sports perimeter.", impact: { athl: 15 } }, { text: "Process analytical chess puzzles and system readouts.", impact: { intl: 15 } }, { text: "Meet with an expansive crew at a local lounge spot.", impact: { char: 15 } }] },
-    { q: "7. An unexpected disagreement erupts outside the residential halls. How do you intervene?", buttons: [{ text: "Physically step in to separate both targets safely.", impact: { athl: 15 } }, { text: "Analyze the rules manual to arbitrate terms legally.", impact: { intl: 10 } }, { text: "Use silver-tongued rhetoric to calm both parameters.", impact: { char: 15 } }] },
-    { q: "8. Select a premium financial workspace package asset.", buttons: [{ text: "High Performance Fitness Core Kit & Subscriptions.", impact: { athl: 15 } }, { text: "Advanced Algorithmic Computational Sandbox Tools.", impact: { intl: 15 } }, { text: "Custom Tailored Executive Professional Attire.", impact: { char: 15 } }] },
-    { q: "9. What foundational legacy do you plan to manifest by graduation?", buttons: [{ text: "Break championship records within regional divisions.", impact: { athl: 20 } }, { text: "Publish peer-reviewed design papers within international files.", impact: { intl: 20 } }, { text: "Secure election victory as overall Student Body Lead.", impact: { char: 20 } }] },
-    { q: "10. How do you treat your private capital accumulation streams?", buttons: [{ text: "Invest heavily into nutrient resources and equipment.", impact: { athl: 10 } }, { text: "Acquire theoretical literature indexes and analytics books.", impact: { intl: 10 } }, { text: "Fund social dinners to expand networking vectors.", impact: { char: 15 } }] }
+    { q: "4. What type of extracurricular deployment matches your interest parameters?", buttons: [{ text: "The Varsity Athletic programs.", impact: { athl: 4 } }, { text: "The Competitive Debate Assembly and Council.", impact: { intl: 4 } }, { text: "The Social Event and Mixer Planning Committee.", impact: { char: 4 } }] },
+    { q: "5. You spot an explicit calculating error in your mentor's presentation board. Your choice?", buttons: [{ text: "Keep silent and maintain physical composure.", impact: { athl: 2 } }, { text: "Approach the board discreetly with correction proofs.", impact: { intl: 4 } }, { text: "Announce it confidently with an engaging query.", impact: { char: 3 } }] },
+    { q: "6. How do you effectively manage exhaustion levels after extensive assignments?", buttons: [{ text: "Run circuit intervals around the oval.", impact: { athl: 2 } }, { text: "Process analytical chess puzzles and system readouts.", impact: { intl: 2 } }, { text: "Meet with an expansive crew at a local lounge spot.", impact: { char: 2 } }] },
+    { q: "7. An unexpected disagreement erupts outside the Dormitories. How do you intervene?", buttons: [{ text: "Physically step in to separate both party safely.", impact: { athl: 2 } }, { text: "Analyze the rules manual to arbitrate terms legally.", impact: { intl: 2 } }, { text: "Use silver-tongued rhetoric to calm both party.", impact: { char: 2 } }] },
+    { q: "8. Select a premium financial workspace package asset.", buttons: [{ text: "High Performance Fitness Core Kit & Subscriptions.", impact: { athl: 1 } }, { text: "Advanced Algorithmic Computational Sandbox Tools.", impact: { intl: 1 } }, { text: "Custom Tailored Executive Professional Attire.", impact: { char: 1 } }] },
+    { q: "9. What foundational legacy do you plan to manifest by graduation?", buttons: [{ text: "Break championship records within regional divisions.", impact: { athl: 1 } }, { text: "Publish peer-reviewed design papers within international files.", impact: { intl: 1 } }, { text: "Secure election victory as overall Student Body Lead.", impact: { char: 1 } }] },
+    { q: "10. How do you treat your private capital accumulation streams?", buttons: [{ text: "Invest heavily on pre workout drink.", impact: { athl: 1 } }, { text: "Acquire theoretical literature and analytics books.", impact: { intl: 1 } }, { text: "Fund social dinners to expand networking.", impact: { char: 1 } }] }
 ];
 
 class StateMasterCampusSimulationEngine {
     constructor() {
         this.state = {
-            firstName: "Ara", lastName: "Marie", gender: "Female", major: "Civil Engineering",
+            firstName: "Jon", lastName: "Doe", gender: "Male", major: "Civil Engineering",
             day: 1, phase: 0, cash: 0, debt: 0, gpa: 2.50, famePoints: 0, energy: 100, maxEnergy: 100, joy: 100,
             athleticism: 10, intellect: 10, charisma: 10,
             greekAffiliation: "None", greekRankIndex: 0,
@@ -364,8 +364,8 @@ class StateMasterCampusSimulationEngine {
     }
 
     advanceToSocioQuestions() {
-        this.state.firstName = document.getElementById("char-first-name").value.trim() || "Ara";
-        this.state.lastName = document.getElementById("char-last-name").value.trim() || "Marie";
+        this.state.firstName = document.getElementById("char-first-name").value.trim() || "Jon";
+        this.state.lastName = document.getElementById("char-last-name").value.trim() || "Doe";
         this.state.gender = document.getElementById("char-gender").value;
         this.state.major = document.getElementById("char-major").value;
         
@@ -426,7 +426,7 @@ class StateMasterCampusSimulationEngine {
 
     getMajorRequiredItem() {
         switch(this.state.major) {
-            case "Civil Engineering": return "Scientific Calculator";
+            case "Engineering": return "Scientific Calculator";
             case "Computer Science": return "High-Spec Laptop";
             case "Fine Arts": return "Premium Sketchbook";
             case "Business Admin": return "Analysis Tablet";
@@ -649,7 +649,7 @@ class StateMasterCampusSimulationEngine {
             let btnPill = document.createElement("button");
             btnPill.className = "quiz-choice-btn";
             btnPill.style.borderColor = "var(--purple)";
-            btnPill.innerText = `💊 Administer Oral Birth Control Pill (Stash Count: ${this.state.inventory.pills})`;
+            btnPill.innerText = `💊 Use Pill (Stash Count: ${this.state.inventory.pills})`;
             btnPill.onclick = () => sim.resolveHookupInteraction("pill");
             optionsBox.appendChild(btnPill);
         }
@@ -658,7 +658,7 @@ class StateMasterCampusSimulationEngine {
             let btnCondom = document.createElement("button");
             btnCondom.className = "quiz-choice-btn";
             btnCondom.style.borderColor = "var(--neon-blue)";
-            btnCondom.innerText = `🛡️ Deploy Premium Protective Latex Barrier (Stash Count: ${this.state.inventory.condoms})`;
+            btnCondom.innerText = `🛡️ Use Condom (Stash Count: ${this.state.inventory.condoms})`;
             btnCondom.onclick = () => sim.resolveHookupInteraction("condom");
             optionsBox.appendChild(btnCondom);
         }
@@ -694,11 +694,11 @@ class StateMasterCampusSimulationEngine {
             display.innerHTML = `
                 <div class="phone-app-grid">
                     <div onclick="sim.bootApp('stats')"><div class="iphone-icon-large">📊</div><span class="app-lbl">Metrics</span></div>
-                    <div onclick="sim.bootApp('spark')"><div class="iphone-icon-large">🔥</div><span class="app-lbl">Spark App</span></div>
-                    <div onclick="sim.bootApp('shop')"><div class="iphone-icon-large">🛒</div><span class="app-lbl">MegaShop</span></div>
-                    <div onclick="sim.bootApp('contacts')"><div class="iphone-icon-large">👥</div><span class="app-lbl">Channels</span></div>
+                    <div onclick="sim.bootApp('spark')"><div class="iphone-icon-large">🔥</div><span class="app-lbl">Tindr</span></div>
+                    <div onclick="sim.bootApp('shop')"><div class="iphone-icon-large">🛒</div><span class="app-lbl">Shopee</span></div>
+                    <div onclick="sim.bootApp('contacts')"><div class="iphone-icon-large">👥</div><span class="app-lbl">Contacts</span></div>
                     
-                    <div><div class="iphone-icon-large" style="opacity:0.2;">⚙️</div><span class="app-lbl">Configs</span></div>
+                    <div><div class="iphone-icon-large" style="opacity:0.2;">⚙️</div><span class="app-lbl">Settings</span></div>
                     <div><div class="iphone-icon-large" style="opacity:0.2;">🗺️</div><span class="app-lbl">Gps Meta</span></div>
                     <div><div class="iphone-icon-large" style="opacity:0.2;">🎵</div><span class="app-lbl">Audio</span></div>
                     <div><div class="iphone-icon-large" style="opacity:0.2;">📩</div><span class="app-lbl">Mail</span></div>
@@ -713,7 +713,7 @@ class StateMasterCampusSimulationEngine {
                 let dynamicMajorReq = this.getMajorRequiredItem();
                 display.innerHTML = `
                     <div class="app-container">
-                        <h4 style="margin:0 0 8px 0; color:var(--emerald);">🛒 ONE-TAP CAMPUS COMMERCE</h4>
+                        <h4 style="margin:0 0 8px 0; color:var(--emerald);">🛒 Shopee</h4>
                         <div style="overflow-y:auto; flex-grow:1; padding-right:2px;">
                             <div style="font-size:10px; text-transform:uppercase; color:var(--neon-blue); margin-bottom:6px; font-weight:bold;">📍 Major Core Needs</div>
                             <div class="shop-row">
@@ -727,21 +727,21 @@ class StateMasterCampusSimulationEngine {
                                 <button class="select-btn" style="padding:4px 10px; font-size:10px;" onclick="sim.executeOnlinePurchase('wants', 'Designer Varsity Fit', 250)">Buy</button>
                             </div>
                             <div class="shop-row">
-                                <div><strong>Premium Vape Rig</strong><br><small style="color:var(--text-muted);">$90 • Stress Management</small></div>
+                                <div><strong>Smok</strong><br><small style="color:var(--text-muted);">$90 • Stress Management</small></div>
                                 <button class="select-btn" style="padding:4px 10px; font-size:10px;" onclick="sim.executeOnlinePurchase('wants', 'Premium Vape Rig', 90)">Buy</button>
                             </div>
 
                             <div style="font-size:10px; text-transform:uppercase; color:var(--pink); margin:10px 0 6px 0; font-weight:bold;">📍 Protection Loadout & Consumables</div>
                             <div class="shop-row">
-                                <div><strong>Oral Birth Control Pills</strong><br><small style="color:var(--text-muted);">$40 • Stash Counter</small></div>
+                                <div><strong>Opill</strong><br><small style="color:var(--text-muted);">$40 • Stash Counter</small></div>
                                 <button class="select-btn" style="padding:4px 10px; font-size:10px;" onclick="sim.executeOnlinePurchase('pills', null, 40)">Buy</button>
                             </div>
                             <div class="shop-row">
-                                <div><strong>Latex Condom Pack</strong><br><small style="color:var(--text-muted);">$15 • Barrier Loadout</small></div>
+                                <div><strong>Trojan</strong><br><small style="color:var(--text-muted);">$15 • Barrier Loadout</small></div>
                                 <button class="select-btn" style="padding:4px 10px; font-size:10px;" onclick="sim.executeOnlinePurchase('condoms', null, 15)">Buy</button>
                             </div>
                             <div class="shop-row">
-                                <div><strong>Pack of Cigarettes</strong><br><small style="color:var(--text-muted);">$12 • Consumable Stash</small></div>
+                                <div><strong>Malboro</strong><br><small style="color:var(--text-muted);">$12 • Consumable Stash</small></div>
                                 <button class="select-btn" style="padding:4px 10px; font-size:10px;" onclick="sim.executeOnlinePurchase('cigs', null, 12)">Buy</button>
                             </div>
                         </div>
